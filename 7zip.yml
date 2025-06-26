@@ -1,0 +1,15 @@
+- name: Installer 7-Zip sur Windows
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Télécharger le setup de 7-Zip
+      win_get_url:
+        url: https://www.7-zip.org/a/7z2301-x64.exe
+        dest: C:\Users\test\Downloads\7zsetup.exe
+
+    - name: Installer 7-Zip silencieusement
+      win_package:
+        path: C:\Users\test\Downloads\7zsetup.exe
+        arguments: /S
+        state: present
