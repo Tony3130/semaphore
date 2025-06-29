@@ -1,0 +1,25 @@
+# Variables Windows (Possible de créer si jamais besoin d'alleger le fichier playbook)
+#windows_software:
+#  - firefox
+#  - 7zip
+#  - vlc
+#  - microsoft-teams
+
+ansible_user_windows: tony
+ansible_password_windows: Azerty77
+ansible_connection_windows: winrm
+ansible_winrm_transport_windows: ntlm
+ansible_winrm_scheme_windows: https
+ansible_winrm_port_windows: 5986
+ansible_winrm_server_cert_validation_windows: ignore
+
+# Possibilité de séparer Linux de Windows si besoin de clarté 
+
+# Variables Linux
+#linux_software:
+#  - firefox
+#  - htop
+#  - curl
+
+ansible_user_linux: tony
+ansible_ssh_private_key_file_linux: ~/.ssh/id_rsa

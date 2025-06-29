@@ -1,0 +1,32 @@
+---
+- name: Déploiements Linux
+  hosts: linux
+  become: yes
+  tasks:
+    - name: Mettre à jour apt
+      apt:
+        update_cache: yes
+
+    - name: Installer logiciels Linux
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - firefox
+        - htop
+        - curl
+
+# Possible de séparer en 2 fichiers distinct si trop chargé pour plus de lisibilité 
+
+- name: Déploiements Windows
+  hosts: windows
+  tasks:
+    - name: Installer logiciels Windows avec Chocolatey
+      win_chocolatey:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - firefox
+        - 7zip
+        - vlc
+        - microsoft-teams
