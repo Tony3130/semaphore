@@ -1,0 +1,66 @@
+---
+- name: Télécharger et installer des logiciels sur le Bureau selon le groupe
+  hosts: windows
+  gather_facts: false
+
+  vars:
+    # Définition de tous les logiciels et de leur info
+    logiciels_disponibles:
+      7zip:
+        url: "https://www.7-zip.org/a/7z1900-x64.exe"
+        path: "%USERPROFILE%\\Desktop\\7z1900-x64.exe"
+        arguments: "/S"
+      firefox:
+        url: "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=fr"
+        path: "%USERPROFILE%\\Desktop\\FirefoxInstaller.exe"
+        arguments: "-ms"
+      notepadpp:
+        url: "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.5/npp.8.6.5.Installer.x64.exe"
+        path: "%USERPROFILE%\\Desktop\\npp.8.6.5.Installer.x64.exe"
+        arguments: "/S"
+      java:
+        url: "https://download.oracle.com/java/17/latest/jdk-17_windows-x64_bin.exe"
+        path: "%USERPROFILE%\\Desktop\\jdk-17_windows-x64_bin.exe"
+        arguments: "/s"
+      nodejs:
+        url: "https://nodejs.org/dist/v20.11.1/node-v20.11.1-x64.msi"
+        path: "%USERPROFILE%\\Desktop\\node-v20.11.1-x64.msi"
+        arguments: "/quiet"
+      virtualbox:
+        url: "https://download.virtualbox.org/virtualbox/7.0.18/VirtualBox-7.0.18-162988-Win.exe"
+        path: "%USERPROFILE%\\Desktop\\VirtualBox-7.0.18-162988-Win.exe"
+        arguments: "--silent"
+
+  tasks:
+    - name: Définir la liste des logiciels à installer selon le groupe
+      set_fact:
+        logiciels_a_installer: >-
+          {% set base = ['7zip', 'firefox', 'notepadpp'] %}
+          {% if 'infra' in group_names %}
+            {{ base + ['java', 'nodejs'] }}
+          {% elif 'commercial' in group_names %}
+            {{ base + ['virtualbox'] }}
+          {% else %}
+            {{ base }}
+          {% endif %}
+
+    - name: Afficher les logiciels qui seront installés (debug)
+      debug:
+        var: logiciels_a_installer
+
+    - name: Télécharger chaque installeur sur le Bureau
+      win_get_url:
+        url: "{{ logiciels_disponibles[item].url }}"
+        dest: "{{ logiciels_disponibles[item].path }}"
+      loop: "{{ logiciels_a_installer }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Installer chaque logiciel téléchargé
+      win_package:
+        path: "{{ logiciels_disponibles[item].path }}"
+        arguments: "{{ logiciels_disponibles[item].arguments }}"
+        state: present
+      loop: "{{ logiciels_a_installer }}"
+      loop_control:
+        label: "{{ item }}"
