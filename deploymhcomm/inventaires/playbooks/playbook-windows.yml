@@ -1,0 +1,26 @@
+
+- name: Déploiements Windows
+  hosts: windows
+  tasks:
+    - name: Installer plusieurs logiciels avec Chocolatey
+      win_chocolatey:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - firefox
+        - 7zip
+        - vlc
+        - microsoft-teams
+
+
+
+- name: Installer logiciels spécifiques commerciaux
+  hosts: commercial
+  tasks:
+    - name: Installer logiciels commerciaux
+      win_chocolatey:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - virtualbox
+        - slack
